@@ -1,0 +1,28 @@
+#!/bin/bash -e
+
+if [[ ! $PEM ]];
+then
+echo "Please make sure that a key is set in your shell's environment by entering 'export PEM=' followed by a path to a key you have chosen."
+exit 0;
+fi
+
+if [[ ! $ENDPOINT ]];
+then
+echo "Please make sure that the server ENDPOINT is set in your shell's environment by entering 'export ENDPOINT=' followed by the url of an exisitng server you have chosen to deploy the docs on."
+exit 0;
+fi
+
+function upload() {
+    filepath=$1
+    scp -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -i $PEM $filepath ubuntu@${ENDPOINT}:/home/ubuntu/ &>/dev/null
+}
+
+mkdocs -q build &>/dev/null
+pushd /home/alex/scripts/fec-docs/site/ &>/dev/null && tar --exclude-vcs -zcPf ../site.tar.gz ./ &>/dev/null && popd &>/dev/null
+cd ~/
+upload /home/alex/scripts/fec-docs/site.tar.gz &>/dev/null
+if [[ -e /home/alex/scripts/fec-docs/site.tar.gz ]];
+then
+    rm /home/alex/scripts/fec-docs/site.tar.gz &>/dev/null
+fi
+ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -t -i $PEM ubuntu@${ENDPOINT} '~/scripts/deploy-docs' #&>/dev/null

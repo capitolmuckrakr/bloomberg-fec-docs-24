@@ -1,0 +1,12 @@
+site_name: bloomberg-fec
+nav:
+    - Home: index.md
+    - Tutorial: tutorial.md
+    - 'Getting started': 'tutorial/1_getting_started.md'
+    - 'Interviewing the data': 'tutorial/2_interviewing_data.md'
+theme:
+  name: readthedocs
+markdown_extensions:
+    - toc:
+        permalink: "#"
+        separator: "_"
